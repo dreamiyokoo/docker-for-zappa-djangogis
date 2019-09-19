@@ -1,0 +1,28 @@
+version: "3"
+services:
+
+  featureapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - app_name=$app_name
+    image: app/$app_name
+
+    environment:
+      - AWS_PROFILE=dreami
+      - AWS_DEFAULT_PROFILE=dreami
+        #      - DJANGO_SETTINGS_MODULE=myapp.settings-local
+        #      - PORT=${PORT:-8000}
+    volumes:
+      - "./:/var/task"
+      - "~/.aws:/root/.aws"
+    tty: true
+    stdin_open: true
+    ports:
+      - "8000:8000"
+#    command: bash -c "rm -rf /var/task/$app_name/MySQLdb && cp -pR /tmp/$app_name/MySQLdb/ /var/task/ && rm -rf /var/task/gis && cp -pR /tmp/$app_name/gis/ /var/task/ && rm -rf /var/task/mecab && cp -pR /tmp/$app_name/mecab/ /var/task/ && source ~/.bashrc && /bin/bash"
+    command: bash -c "rm -rf /var/task/MySQLdb && cp -pR /tmp/$app_name/MySQLdb/ /var/task/ && rm -rf /var/task/gis && cp -pR /tmp/$app_name/gis/ /var/task/ && rm -rf /var/task/mecab && cp -pR /tmp/$app_name/mecab/ /var/task/ && cp /usr/lib64/mysql/libmysqlclient.so.18 /var/task/MySQLdb/ && source ~/.bashrc && /bin/bash"
+
+#    command: bash -c "source ~/.bashrc && /bin/bash"
+

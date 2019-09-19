@@ -1,0 +1,5 @@
+gis
+mecab
+MySQLdb
+zappa_settings.json
+settings.py

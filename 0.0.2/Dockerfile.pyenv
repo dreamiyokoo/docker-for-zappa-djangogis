@@ -1,0 +1,14 @@
+FROM 278289096971.dkr.ecr.ap-northeast-1.amazonaws.com/anyenv:latest
+
+ENV PYTHON_VERSION 3.6.8
+RUN source ~/.bashrc && \
+	anyenv install pyenv && \
+	git clone https://github.com/yyuu/pyenv-virtualenv ${HOME}/.anyenv/envs/pyenv/plugins/pyenv-virtualenva && \
+	source ~/.bashrc && \
+	pyenv install $PYTHON_VERSION && \
+        echo 'eval "$(pyenv init -)"' >> ${HOME}/.bashrc && \
+        echo 'eval "$(pyenv virtualenv-init -)"' >> ${HOME}/.bashrc 
+
+
+CMD /bin/bash
+
