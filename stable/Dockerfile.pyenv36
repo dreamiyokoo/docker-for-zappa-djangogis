@@ -1,6 +1,6 @@
-FROM 278289096971.dkr.ecr.ap-northeast-1.amazonaws.com/anyenv:latest
+FROM anyenv
 
-ENV PYTHON_VERSION 3.7.4
+ENV PYTHON_VERSION 3.6.9
 RUN source ~/.bashrc && \
 	anyenv install pyenv && \
 	git clone https://github.com/yyuu/pyenv-virtualenv ${HOME}/.anyenv/envs/pyenv/plugins/pyenv-virtualenva && \
