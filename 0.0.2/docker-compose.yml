@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
       args:
         - app_name=$app_name
-    image: app/$app_name
+    image: app/$app_name:py-3.6
 
     environment:
       - AWS_PROFILE=dreami
