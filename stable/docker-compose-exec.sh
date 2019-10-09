@@ -1,1 +1,1 @@
-docker-compose exec feature37app /bin/bash
+docker-compose exec featureapp /bin/bash

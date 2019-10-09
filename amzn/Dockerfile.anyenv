@@ -1,0 +1,21 @@
+FROM amazonlinux
+
+RUN yum install -y git
+
+RUN git clone https://github.com/riywo/anyenv ${HOME}/.anyenv
+RUN echo 'export PATH="${HOME}/.anyenv/bin:$PATH"' >> ${HOME}/.bashrc && \
+	source ${HOME}/.bashrc && \
+	mkdir -p $(anyenv root)/plugins && \
+	git clone https://github.com/znz/anyenv-update.git $(anyenv root)/plugins/anyenv-update && \
+	echo 'eval "$(anyenv init -)"' >> ${HOME}/.bashrc && \
+	source ${HOME}/.bashrc && \
+	yes | anyenv install --init 
+
+#RUN echo 'export PATH="${HOME}/.anyenv/bin:$PATH"' >> ${HOME}/.bashrc && \
+#	source ${HOME}/.bashrc && \
+#	yes | anyenv install --init && \
+#	anyenv install -l
+
+
+CMD /bin/bash
+

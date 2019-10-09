@@ -1,7 +1,7 @@
-FROM gis/feature37 AS gis_app
-FROM mecab/feature37 AS mecab_app
+FROM gis/feature:py-3.7 AS gis_app
+FROM mecab/feature:py-3.7 AS mecab_app
 
-FROM pyenv37
+FROM pyenv:3.7
 #RUN apk --no-cache add ca-certificates
 ARG app_name
 WORKDIR /tmp/$app_name/
@@ -10,7 +10,6 @@ COPY --from=gis_app /tmp/$app_name .
 
 
 #FROM pyenv AS pyenv_app
-
 #FROM gis
 #ARG app_name
 #WORKDIR /tmp/task/

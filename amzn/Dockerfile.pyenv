@@ -1,0 +1,15 @@
+FROM anyenv:amzn
+
+RUN yum install -y tar gcc make zlib zlib-devel libffi-devel gcc-c++  readline-devel openssl-devel bzip2-devel sqlite-devel
+ENV PYTHON_VERSION 3.7.4
+RUN source ~/.bashrc && \
+	anyenv install pyenv && \
+	git clone https://github.com/yyuu/pyenv-virtualenv ${HOME}/.anyenv/envs/pyenv/plugins/pyenv-virtualenv && \
+	source ~/.bashrc && \
+	pyenv install $PYTHON_VERSION && \
+        echo 'eval "$(pyenv init -)"' >> ${HOME}/.bashrc && \
+        echo 'eval "$(pyenv virtualenv-init -)"' >> ${HOME}/.bashrc 
+
+
+CMD /bin/bash
+

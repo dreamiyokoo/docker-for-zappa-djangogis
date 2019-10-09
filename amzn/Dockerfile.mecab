@@ -1,0 +1,42 @@
+
+# Install python module needed for gdal and rasterio
+FROM amazonlinux
+
+RUN yum update -y && yum clean all
+
+
+ENV MECAB_SOURCE_URL https://drive.google.com/uc?export=download&id=0B4y35FiV1wh7cENtOXlicTFaRUE
+ENV IPADIC_SOURCE_URL https://drive.google.com/uc?export=download&id=0B4y35FiV1wh7MWVlSDBCSXZMTXM
+ENV MECAB_VERSION 0.996
+ENV IPADIC_VERSION 2.7.0-20070801
+
+ARG app_name
+ENV APP_DIR /tmp/$app_name/mecab
+ENV LAMBDA_PACKAGE_DIR $APP_DIR
+RUN mkdir -p $APP_DIR
+
+RUN cd $APP_DIR && \
+	curl -L $MECAB_SOURCE_URL -o mecab.tar.gz && \
+	tar -zxvf mecab.tar.gz && \
+	cd mecab-${MECAB_VERSION} && \
+	./configure --prefix=${LAMBDA_PACKAGE_DIR}/${LIB_MECAB_DIR_NAME} --with-charset=utf8 && \
+	make && make install && \
+	cd $APP_DIR && rm -rf mecab.tar.gz mecab-${MECAB_VERSION}
+
+
+RUN cd $APP_DIR && \
+	curl -L ${IPADIC_SOURCE_URL} -o mecab-ipadic.tar.gz && \
+	tar -zxvf mecab-ipadic.tar.gz && \
+	cd mecab-ipadic-${IPADIC_VERSION} && \
+	./configure --prefix=${LAMBDA_PACKAGE_DIR}/${LIB_MECAB_DIR_NAME} --with-charset=utf8 --with-mecab-config=${LAMBDA_PACKAGE_DIR}/${LIB_MECAB_DIR_NAME}/bin/mecab-config && \
+	make && make install && \
+	cd $APP_DIR && rm -rf mecab-ipadic.tar.gz mecab-ipadic-${IPADIC_VERSION}
+
+ENV PATH $APP_DIR/bin:$PATH
+#RUN cd $APP_DIR && \
+#        git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git && \
+#        cd mecab-ipadic-neologd && \
+#        yes yes | ./bin/install-mecab-ipadic-neologd -n && \
+#        cd $APP_DIR && rm -rf mecab-ipadic-neologd
+
+CMD /bin/bash

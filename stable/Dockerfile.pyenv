@@ -1,4 +1,4 @@
-FROM anyenv
+FROM anyenv:py-3.7
 
 ENV PYTHON_VERSION 3.7.4
 RUN source ~/.bashrc && \

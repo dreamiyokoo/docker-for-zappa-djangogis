@@ -1,0 +1,14 @@
+FROM anyenv
+
+ENV PYTHON_VERSION 3.6.9
+RUN source ~/.bashrc && \
+	anyenv install pyenv && \
+	git clone https://github.com/yyuu/pyenv-virtualenv ${HOME}/.anyenv/envs/pyenv/plugins/pyenv-virtualenv && \
+	source ~/.bashrc && \
+	pyenv install $PYTHON_VERSION && \
+        echo 'eval "$(pyenv init -)"' >> ${HOME}/.bashrc && \
+        echo 'eval "$(pyenv virtualenv-init -)"' >> ${HOME}/.bashrc 
+
+
+CMD /bin/bash
+

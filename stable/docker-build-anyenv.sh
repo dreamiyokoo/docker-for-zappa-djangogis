@@ -1,2 +1,2 @@
-docker build -t anyenv -f Dockerfile.anyenv  .
+docker build -t anyenv:py-3.7 -f Dockerfile.anyenv  .
 

@@ -1,0 +1,139 @@
+FROM amazonlinux
+
+# Install python module needed for gdal and rasterio
+RUN yum update -y && yum upgrade -y
+RUN yum install -y yum-utils
+RUN yum-config-manager --enable epel
+#RUN yum install -y gdal-python
+RUN yum install -y make automake gcc gcc-c++ libcurl-devel proj-devel geos-devel gzip bzip2 patch
+
+RUN yum install -y yum-plugin-ovl || true
+
+#RUN touch /var/lib/rpm/* && yum install -y geos-devel
+
+# Install apt dependencies fro GDAL and drivers
+RUN yum install -y libjpeg-devel zlib-devel libpng-devel libcurl-devel \
+                   sqlite-devel.x86_64 wget zip  unzip tar gzip libtool cmake || true
+
+# ENV APP_DIR /var/task
+#ENV APP_DIR /tmp/hogehoge
+ARG app_name
+ENV APP_DIR /tmp/$app_name/gis
+RUN mkdir -p $APP_DIR
+
+ENV PROJ_VERSION 4.9.3
+#RUN cd $APP_DIR \
+#   && wget -q --no-check-certificate https://github.com/OSGeo/proj.4/archive/$PROJ_VERSION.zip \
+#   && unzip $PROJ_VERSION.zip \
+#   && cd PROJ-$PROJ_VERSION \
+#   && sh autogen.sh \
+#   && ./configure CFLAGS="-O2 -Wl,-S" --prefix=$APP_DIR \
+#   && make && make install && make clean \
+#   && rm -rf $APP_DIR/$PROJ_VERSION.zip $APP_DIR/PROJ-$PROJ_VERSION
+
+ENV PROJ4_VERSION 4.9.3
+RUN cd $APP_DIR && \
+	curl -o "proj-${PROJ4_VERSION}.tar.gz" \
+	"http://download.osgeo.org/proj/proj-${PROJ4_VERSION}.tar.gz" \
+	&& tar xvf "proj-${PROJ4_VERSION}.tar.gz" && \
+#	cd "$APP_DIR/proj-${PROJ4_VERSION}" && \
+#	./configure --prefix=$APP_DIR \
+#	&& make && make install && make clean \
+#	&& rm -rf $APP_DIR/proj-$PROJ_VERSION.tar $APP_DIR/PROJ-$PROJ_VERSION
+	 /bin/bash
+
+
+ENV GEOS_VERSION 3.6.2
+RUN cd $APP_DIR \
+  && wget http://download.osgeo.org/geos/geos-$GEOS_VERSION.tar.bz2 \
+  && tar jxf geos-$GEOS_VERSION.tar.bz2 \
+  && cd geos-$GEOS_VERSION \
+  && CFLAGS="-O2 -Wl,-S" CXXFLAGS="-O2 -Wl,-S" ./configure --prefix=$APP_DIR \
+  && make && make install && make clean \
+  && rm -rf $APP_DIR/geos-$GEOS_VERSION $APP_DIR/geos-$GEOS_VERSION.tar.bz2
+
+ENV OPENJPEG_VERSION 2.3.0
+RUN cd $APP_DIR \
+  && wget https://github.com/uclouvain/openjpeg/archive/v$OPENJPEG_VERSION.tar.gz \
+  && tar -zvxf v$OPENJPEG_VERSION.tar.gz \
+  && cd openjpeg-$OPENJPEG_VERSION/ \
+  && mkdir build \
+  && cd build \
+  && cmake .. -DBUILD_THIRDPARTY:BOOL=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$APP_DIR \
+  && make install && make clean \
+  && rm -rf $APP_DIR/openjpeg-$OPENJPEG_VERSION $APP_DIR/v$OPENJPEG_VERSION.tar.gz
+
+ENV LD_LIBRARY_PATH=$APP_DIR/lib:$LD_LIBRARY_PATH
+
+# Build and install GDAL (minimal support geotiff and jp2 support, https://trac.osgeo.org/gdal/wiki/BuildingOnUnixWithMinimizedDrivers#no1)
+# applying patch from Sean Gillies https://github.com/sgillies/frs-wheel-builds/blob/fafaeadfb638f44d8384e3742c829d2d68297915/patches/changeset_40330.diff
+#   to enable openjpeg 2.3.0 support
+ENV GDAL_VERSION 2.2.2
+# ENV GDAL_VERSION 1.11.2
+RUN cd $APP_DIR \
+  && wget http://download.osgeo.org/gdal/$GDAL_VERSION/gdal${GDAL_VERSION//.}.zip \
+  && unzip gdal${GDAL_VERSION//.}.zip \
+  && cd $APP_DIR/gdal-$GDAL_VERSION \
+  && wget https://github.com/sgillies/frs-wheel-builds/raw/fafaeadfb638f44d8384e3742c829d2d68297915/patches/changeset_40330.diff \
+  && patch -u --verbose -p4 < ./changeset_40330.diff \
+  && CFLAGS="-O2 -Wl,-S" CXXFLAGS="-O2 -Wl,-S" ./configure \
+      --prefix=$APP_DIR \
+      --with-static-proj4=$APP_DIR \
+      --with-geos=$APP_DIR/bin/geos-config \
+      --with-openjpeg=$APP_DIR \
+      --with-threads \
+      --disable-debug \
+      --with-jpeg \
+      --with-hide-internal-symbols \
+      --with-curl \
+      --without-bsb \
+      --without-cfitsio \
+      --without-cryptopp \
+      --without-ecw \
+      --without-expat \
+      --without-fme \
+      --without-freexl \
+      --without-gif \
+      --without-gif \
+      --without-gnm \
+      --without-grass \
+      --without-grib \
+      --without-hdf4 \
+      --without-hdf5 \
+      --without-idb \
+      --without-ingres \
+      --without-jasper \
+      --without-jp2mrsid \
+      --without-kakadu \
+      --without-libgrass \
+      --without-libkml \
+      --without-libtool \
+      --without-mrf \
+      --without-mrsid \
+      --without-mysql \
+      --without-netcdf \
+      --without-odbc \
+      --without-ogdi \
+      --without-pcidsk \
+      --without-pcraster \
+      --without-pcre \
+      --without-perl \
+      --without-pg \
+      --without-php \
+      --with-png \
+      --without-python \
+      --without-qhull \
+      --without-sde \
+      --without-sqlite3 \
+      --without-webp \
+      --without-xerces \
+      --without-xml2 \
+    && make && make install \
+    && rm -rf $APP_DIR/gdal${GDAL_VERSION//.}.zip $APP_DIR/gdal-$GDAL_VERSION
+
+#RUN find $APP_DIR -type l | xargs rm -f
+
+ENV GDAL_DATA $APP_DIR/share/gdal
+ENV GDAL_CONFIG $APP_DIR/bin/gdal-config
+
+CMD /bin/bash
