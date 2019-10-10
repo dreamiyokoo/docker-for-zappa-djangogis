@@ -1,7 +1,7 @@
 version: "3"
 services:
 
-  feature37app:
+  sampleapp:
     build:
       context: .
       dockerfile: Dockerfile
@@ -12,6 +12,8 @@ services:
     environment:
       - AWS_PROFILE=dreami
       - AWS_DEFAULT_PROFILE=dreami
+      - DISPLAY=$DISPLAY_MAC
+      - LANG=ja_JP.UTF-8
         #      - DJANGO_SETTINGS_MODULE=myapp.settings-local
         #      - PORT=${PORT:-8000}
     volumes:

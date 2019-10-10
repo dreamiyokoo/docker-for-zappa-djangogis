@@ -36,6 +36,12 @@ RUN source ${HOME}/.bashrc && \
 	pip install mysqlclient -t /tmp/$app_name && \
 	pip install -r /tmp/task/requirements.txt && \
         echo "pyenv local $app_name" >> ~/.bashrc
+RUN  yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
+	yum update -y && \
+	yum install -y dbus-x11 glibc-langpack-ja && \
+	yum -y install ibus-kkc vlgothic-* && \
+	yum install -y terminator
+
 
 WORKDIR /var/task/
 

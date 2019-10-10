@@ -3,6 +3,11 @@
 FROM amazonlinux
 
 RUN yum update -y && yum clean all
+RUN yum install -y libjpeg-devel zlib-devel libpng-devel libcurl-devel \
+                   sqlite-devel.x86_64 wget zip  unzip tar gzip libtool cmake || true
+RUN yum install -y make automake gcc gcc-c++ libcurl-devel proj-devel geos-devel gzip bzip2 patch
+
+
 
 
 ENV MECAB_SOURCE_URL https://drive.google.com/uc?export=download&id=0B4y35FiV1wh7cENtOXlicTFaRUE
