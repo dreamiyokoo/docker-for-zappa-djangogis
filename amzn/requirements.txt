@@ -16,7 +16,7 @@ jmespath==0.9.3
 kappa==0.6.0
 lambda-packages==0.20.0
 mysqlclient==1.4.4
-numpy==1.17.2
+numpy==1.22.0
 packaging==19.2
 pip-review==1.0
 pipdeptree==0.13.2
